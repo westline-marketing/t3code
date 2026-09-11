@@ -1,2 +1,52 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+#
+# Westline CodeRabbit config — review-on-demand, not review-every-push.
+#
+# CodeRabbit spends one review per push to an open PR, and every review counts
+# against a per-developer hourly rate limit that tightens as weekly volume
+# climbs. Agentic loops push many commits per branch, so stock defaults burn
+# 5+ reviews on a single PR and leave nothing for the diff that ships.
+#
+# With this config CodeRabbit stays quiet until the branch is done, then
+# reviews once, on the finished diff.
+#
+#   Trigger a review : add the `review-ready` label, or comment @coderabbitai review
+#   Check capacity   : comment @coderabbitai rate limit   <- free, spends nothing
+#
+# A rate-limited push posts a PASSING check named "Review rate limited" — green
+# there does NOT mean reviewed. Read the comment, not the check.
+#
+# Full rationale, limit tables, and the upgrade math: Playbooks appendix
+# appendices/coderabbit-reviews.md
+
+# Merge any keys added to the org-wide central config
+# (westline-marketing/coderabbit) that this file does not set explicitly.
+inheritance: true
+
+language: en-US
+
 reviews:
+  profile: chill
+  # Repo-specific: t3code suppresses CodeRabbit's review-status comment.
   review_status: false
+  high_level_summary: true
+
+  auto_review:
+    # Off by default. A positive label match still opts a PR in, so this is
+    # an opt-in workflow rather than a hard disable.
+    enabled: false
+
+    labels:
+      - review-ready
+      - "!wip"
+
+    # Belt and braces: if auto_review is ever re-enabled in a project, stop
+    # incremental reviews after the first reviewed commit (default is 5).
+    auto_pause_after_reviewed_commits: 1
+
+    drafts: false
+
+    ignore_title_keywords:
+      - wip
+      - draft
+      - chore
